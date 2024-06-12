@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Your Assessments</h2>
+  {% if assessments %}
+    <ul>
+      {% for assessment in assessments %}
+        <li>
+          <a href="{{ url_for('assessment.view_assessment', assessment_id=assessment.id) }}">
+            {{ assessment.threat_actor }} - {{ assessment.questionnaire.name }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You have not completed any assessments yet.</p>
+  {% endif %}
+  <a href="{{ url_for('questionnaire.list_questionnaires') }}">Back to Questionnaires</a>
+{% endblock %}

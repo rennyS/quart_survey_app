@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Create Questionnaire</h2>
+  <form method="post">
+    <div class="form-group">
+      <label for="name">Questionnaire Name:</label>
+      <input type="text" class="form-control" id="name" name="name">
+    </div>
+    <div class="form-group">
+      <label for="num_questions">Number of Questions:</label>
+      <input type="number" class="form-control" id="num_questions" name="num_questions" min="1">
+    </div>
+    <div id="questions"></div>
+    <button type="button" class="btn btn-primary" onclick="addQuestions()">Add Questions</button><br><br>
+    <button type="submit" class="btn btn-success">Create</button>
+  </form>
+  <script>
+    function addQuestions() {
+      var num = document.getElementById('num_questions').value;
+      var questionsDiv = document.getElementById('questions');
+      questionsDiv.innerHTML = '';
+      for (var i = 0; i < num; i++) {
+        questionsDiv.innerHTML += `
+          <div class="form-group">
+            <label for="question_${i}_text">Question ${i + 1}:</label>
+            <input type="text" class="form-control" id="question_${i}_text" name="question_${i}_text">
+          </div>
+          <div class="form-group">
+            <label for="question_${i}_type">Type:</label>
+            <select class="form-control" id="question_${i}_type" name="question_${i}_type" onchange="updateScoreFields(${i})">
+              <option value="yes_no" selected>Yes/No</option>
+              <option value="dropdown">Dropdown</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="question_${i}_classification">Classification:</label>
+            <select class="form-control" id="question_${i}_classification" name="question_${i}_classification">
+              <option value="impact">Impact</option>
+              <option value="probability">Probability</option>
+            </select>
+          </div>
+          <div id="question_${i}_scores"></div>
+          <hr>`;
+        updateScoreFields(i); // Call the function to show score fields by default
+      }
+    }
+
+    function updateScoreFields(index) {
+      var type = document.getElementById(`question_${index}_type`).value;
+      var scoresDiv = document.getElementById(`question_${index}_scores`);
+      if (type == 'yes_no') {
+        scoresDiv.innerHTML = `
+          <div class="form-group">
+            <label for="question_${index}_yes_score">Yes Score:</label>
+            <input type="number" class="form-control" id="question_${index}_yes_score" name="question_${index}_yes_score">
+          </div>
+          <div class="form-group">
+            <label for="question_${index}_no_score">No Score (default 0):</label>
+            <input type="number" class="form-control" id="question_${index}_no_score" name="question_${index}_no_score" value="0" readonly>
+          </div>`;
+      } else if (type == 'dropdown') {
+        scoresDiv.innerHTML = `
+          <div class="form-group">
+            <label for="question_${index}_high_score">High Score:</label>
+            <input type="number" class="form-control" id="question_${index}_high_score" name="question_${index}_high_score">
+          </div>
+          <div class="form-group">
+            <label for="question_${index}_medium_score">Medium Score:</label>
+            <input type="number" class="form-control" id="question_${index}_medium_score" name="question_${index}_medium_score">
+          </div>
+          <div class="form-group">
+            <label for="question_${index}_low_score">Low Score:</label>
+            <input type="number" class="form-control" id="question_${index}_low_score" name="question_${index}_low_score">
+          </div>`;
+      }
+    }
+  </script>
+{% endblock %}

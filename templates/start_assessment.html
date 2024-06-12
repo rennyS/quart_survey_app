@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Start Assessment: {{ questionnaire.name }}</h2>
+  <form method="post">
+    <label for="threat_actor">Threat Actor:</label>
+    <input type="text" id="threat_actor" name="threat_actor"><br><br>
+    {% for question in questionnaire.questions %}
+      <label for="question_{{ question.id }}_response">{{ question.text }}:</label>
+      {% if question.question_type == 'yes_no' %}
+        <input type="radio" id="question_{{ question.id }}_response_yes" name="question_{{ question.id }}_response" value="yes">
+        <label for="question_{{ question.id }}_response_yes">Yes</label>
+        <input type="radio" id="question_{{ question.id }}_response_no" name="question_{{ question.id }}_response" value="no">
+        <label for="question_{{ question.id }}_response_no">No</label><br>
+      {% elif question.question_type == 'dropdown' %}
+        <select id="question_{{ question.id }}_response" name="question_{{ question.id }}_response">
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select><br>
+      {% endif %}
+    {% endfor %}
+    <button type="submit">Submit Assessment</button>
+  </form>
+{% endblock %}

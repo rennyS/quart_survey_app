@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Your Questionnaires</h2>
+  {% if questionnaires %}
+    <ul>
+      {% for questionnaire in questionnaires %}
+        <li><a href="{{ url_for('questionnaire.view_questionnaire', questionnaire_id=questionnaire.id) }}">{{ questionnaire.name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You have not created any questionnaires yet.</p>
+  {% endif %}
+  <a href="{{ url_for('questionnaire.create_questionnaire') }}">Create a new Questionnaire</a>
+{% endblock %}

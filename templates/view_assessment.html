@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Assessment for Threat Actor: {{ assessment.threat_actor }}</h2>
+  <h3>Questionnaire: {{ assessment.questionnaire.name }}</h3>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Question</th>
+        <th>Response</th>
+        <th>Score</th>
+        <th>Classification</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for response in assessment.responses %}
+      <tr>
+        <td>{{ response.question.text }}</td>
+        <td>{{ response.response }}</td>
+        <td>{{ response.score }}</td>
+        <td>{{ response.question.classification }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Impact vs Probability Matrix</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Scores</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Impact</td>
+        <td>
+          {% for score in impact_scores %}
+            {{ score }} 
+          {% endfor %}
+        </td>
+        <td>{{ total_impact }}</td>
+      </tr>
+      <tr>
+        <td>Probability</td>
+        <td>
+          {% for score in probability_scores %}
+            {{ score }} 
+          {% endfor %}
+        </td>
+        <td>{{ total_probability }}</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3>Probability vs Impact Matrix Plot</h3>
+  <img src="{{ url_for('static', filename='plots/' ~ plot_filename) }}" alt="Probability vs Impact Matrix">
+
+  <a href="{{ url_for('assessment.list_assessments') }}" class="btn btn-primary mt-3">Back to Assessments</a>
+{% endblock %}

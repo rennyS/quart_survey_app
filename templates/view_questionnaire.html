@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Questionnaire: {{ questionnaire.name }}</h2>
+  <ul>
+    {% for question in questionnaire.questions %}
+      <li>{{ question.text }} ({{ question.question_type }})</li>
+    {% endfor %}
+  </ul>
+  <a href="{{ url_for('questionnaire.list_questionnaires') }}">Back to Questionnaires</a>
+  <a href="{{ url_for('assessment.start_assessment', questionnaire_id=questionnaire.id) }}">Start Assessment</a>
+{% endblock %}

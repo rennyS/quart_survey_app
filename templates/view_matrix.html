@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Impact vs Probability Matrix for Assessment: {{ assessment.threat_actor }}</h2>
+  <h3>Questionnaire: {{ assessment.questionnaire.name }}</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Question</th>
+        <th>Impact Score</th>
+        <th>Probability Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for response in assessment.responses %}
+        <tr>
+          <td>{{ response.question.text }}</td>
+          <td>{% if response.question.classification == 'impact' %}{{ response.score }}{% endif %}</td>
+          <td>{% if response.question.classification == 'probability' %}{{ response.score }}{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="{{ url_for('assessment.list_assessments') }}">Back to Assessments</a>
+{% endblock %}
