@@ -3,6 +3,7 @@ from tortoise.contrib.quart import register_tortoise
 from auth import auth_bp, get_current_user
 from questionnaire import questionnaire_bp
 from assessment import assessment_bp
+from admin import admin_bp
 
 app = Quart(__name__)
 app.secret_key = 'supersecretkey'
@@ -10,6 +11,7 @@ app.secret_key = 'supersecretkey'
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(questionnaire_bp, url_prefix='/questionnaire')
 app.register_blueprint(assessment_bp, url_prefix='/assessment')
+app.register_blueprint(admin_bp, url_prefix='/admin')
 
 @app.before_request
 async def before_request():

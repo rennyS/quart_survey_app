@@ -13,7 +13,10 @@ async def list_assessments():
     if not g.user:
         return redirect(url_for('auth.login'))
 
-    assessments = await Assessment.filter(questionnaire__user=g.user).prefetch_related('questionnaire')
+    if g.user.is_admin:
+        assessments = await Assessment.all().prefetch_related('questionnaire')
+    else:
+        assessments = await Assessment.filter(team=g.user.team).prefetch_related('questionnaire')
     return await render_template('list_assessments.html', assessments=assessments)
 
 @assessment_bp.route('/start/<int:questionnaire_id>', methods=['GET', 'POST'])
@@ -25,7 +28,7 @@ async def start_assessment(questionnaire_id):
     if request.method == 'POST':
         data = await request.form
         threat_actor = data['threat_actor']
-        assessment = await Assessment.create(threat_actor=threat_actor, questionnaire=questionnaire)
+        assessment = await Assessment.create(threat_actor=threat_actor, questionnaire=questionnaire, team=g.user.team)
         
         for question in questionnaire.questions:
             response = data[f'question_{question.id}_response']
@@ -100,27 +103,32 @@ def create_risk_matrix(total_impact, total_probability, assessment_id):
 
 
 
-
-
 @assessment_bp.route('/view/<int:assessment_id>')
 async def view_assessment(assessment_id):
     if not g.user:
         return redirect(url_for('auth.login'))
 
-    assessment = await Assessment.get(id=assessment_id).prefetch_related('questionnaire__user', 'responses__question')
-    if not assessment or assessment.questionnaire.user.id != g.user.id:
+    print(f"Fetching assessment with ID: {assessment_id}")
+
+    assessment = await Assessment.get_or_none(id=assessment_id).select_related('team', 'questionnaire__user').prefetch_related('responses__question')
+    if not assessment:
+        print(f"No assessment found with ID: {assessment_id}")
+        return redirect(url_for('assessment.list_assessments'))
+
+    if assessment.team_id != g.user.team_id:
+        print(f"User not authorized to view this assessment. User's team: {g.user.team_id}, Assessment's team: {assessment.team_id}")
         return redirect(url_for('assessment.list_assessments'))
 
     impact_scores = [response.score for response in assessment.responses if response.question.classification == 'impact']
     probability_scores = [response.score for response in assessment.responses if response.question.classification == 'probability']
     
     if impact_scores:
-        total_impact = sum(impact_scores) / len(impact_scores)  # Calculating average impact score
+        total_impact = sum(impact_scores)
     else:
         total_impact = 0
     
     if probability_scores:
-        total_probability = sum(probability_scores) / len(probability_scores)  # Calculating average probability score
+        total_probability = sum(probability_scores)
     else:
         total_probability = 0
     

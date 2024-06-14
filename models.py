@@ -1,15 +1,22 @@
 from tortoise import fields, models
 
+class Team(models.Model):
+    id = fields.IntField(pk=True)
+    name = fields.CharField(max_length=100, unique=True)
+
 class User(models.Model):
     id = fields.IntField(pk=True)
     username = fields.CharField(max_length=80, unique=True)
     password_hash = fields.CharField(max_length=256)
+    team = fields.ForeignKeyField('models.Team', related_name='members')
+    is_admin = fields.BooleanField(default=False)  # Add this line
 
 class Questionnaire(models.Model):
     id = fields.IntField(pk=True)
     name = fields.CharField(max_length=120)
     user = fields.ForeignKeyField('models.User', related_name='questionnaires')
     created_at = fields.DatetimeField(auto_now_add=True)
+    team = fields.ForeignKeyField('models.Team', related_name='questionnaires')
 
 class Question(models.Model):
     id = fields.IntField(pk=True)
@@ -28,6 +35,7 @@ class Assessment(models.Model):
     threat_actor = fields.CharField(max_length=120)
     questionnaire = fields.ForeignKeyField('models.Questionnaire', related_name='assessments')
     created_at = fields.DatetimeField(auto_now_add=True)
+    team = fields.ForeignKeyField('models.Team', related_name='assessments')
 
 class AssessmentResponse(models.Model):
     id = fields.IntField(pk=True)

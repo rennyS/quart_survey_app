@@ -11,7 +11,7 @@ async def create_questionnaire():
     if request.method == 'POST':
         data = await request.form
         name = data['name']
-        questionnaire = await Questionnaire.create(name=name, user=g.user)
+        questionnaire = await Questionnaire.create(name=name, user=g.user, team=g.user.team)
         
         for i in range(int(data['num_questions'])):
             question_text = data[f'question_{i}_text']
@@ -26,24 +26,27 @@ async def create_questionnaire():
                                   yes_score=yes_score, no_score=no_score, high_score=high_score, medium_score=medium_score, low_score=low_score, 
                                   questionnaire=questionnaire)
         
-        return redirect(url_for('index'))
+        return redirect(url_for('questionnaire.list_questionnaires'))
     return await render_template('create_questionnaire.html')
 
 @questionnaire_bp.route('/list')
 async def list_questionnaires():
     if not g.user:
         return redirect(url_for('auth.login'))
-        
-    questionnaires = await Questionnaire.filter(user=g.user).all()
+
+    if g.user.is_admin:
+        questionnaires = await Questionnaire.all().prefetch_related('user')
+    else:
+        questionnaires = await Questionnaire.filter(team=g.user.team).prefetch_related('user')
     return await render_template('list_questionnaires.html', questionnaires=questionnaires)
 
 @questionnaire_bp.route('/view/<int:questionnaire_id>')
 async def view_questionnaire(questionnaire_id):
     if not g.user:
         return redirect(url_for('auth.login'))
-        
-    questionnaire = await Questionnaire.get_or_none(id=questionnaire_id).prefetch_related('questions')
-    if not questionnaire or questionnaire.user_id != g.user.id:
+
+    questionnaire = await Questionnaire.get(id=questionnaire_id).prefetch_related('questions')
+    if not questionnaire or (not g.user.is_admin and questionnaire.team_id != g.user.team_id):
         return redirect(url_for('questionnaire.list_questionnaires'))
-        
+
     return await render_template('view_questionnaire.html', questionnaire=questionnaire)

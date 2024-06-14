@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Assessment for Threat Actor: {{ assessment.threat_actor }}</h2>
-  <h3>Questionnaire: {{ assessment.questionnaire.name }}</h3>
-  <table class="table table-bordered">
+  <h1>Assessment for Threat Actor: {{ assessment.threat_actor }}</h1>
+  <h2>Questionnaire: {{ assessment.questionnaire.name }}</h2>
+  <table class="table">
     <thead>
       <tr>
         <th>Question</th>
@@ -25,7 +25,7 @@
   </table>
 
   <h2>Impact vs Probability Matrix</h2>
-  <table class="table table-bordered">
+  <table class="table">
     <thead>
       <tr>
         <th>Type</th>

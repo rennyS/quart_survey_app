@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Your Questionnaires</h2>
+  <h2>Your Team's Questionnaires</h2>
   {% if questionnaires %}
     <ul>
       {% for questionnaire in questionnaires %}
-        <li><a href="{{ url_for('questionnaire.view_questionnaire', questionnaire_id=questionnaire.id) }}">{{ questionnaire.name }}</a></li>
+        <li>
+          <a href="{{ url_for('questionnaire.view_questionnaire', questionnaire_id=questionnaire.id) }}">
+            {{ questionnaire.name }}
+          </a> - created by {{ questionnaire.user.username }}
+        </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p>You have not created any questionnaires yet.</p>
+    <p>No questionnaires found for your team.</p>
   {% endif %}
-  <a href="{{ url_for('questionnaire.create_questionnaire') }}">Create a new Questionnaire</a>
+  <a href="{{ url_for('questionnaire.create_questionnaire') }}">Create New Questionnaire</a>
 {% endblock %}
